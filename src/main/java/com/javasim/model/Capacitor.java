@@ -5,7 +5,8 @@ import com.javasim.model.interfaces.ISimulatable;
 
 public class Capacitor extends Component implements IElectrical, ISimulatable {
     private double previousVoltageDiff = 0.0;
-
+    private boolean isBroken = false;
+    private static final double VOLTAGE_LIMIT = 25.0;
     public Capacitor(String name, double capacitance) {
         super(name, capacitance, 2);
     }
@@ -32,13 +33,21 @@ public class Capacitor extends Component implements IElectrical, ISimulatable {
         if (nodeB > 0) rhsVector[nodeB - 1] -= equivalentCurrent;
     }
 
-    public void UpdateState(double vA, double vB) {
+    public void RecordPhysicsState(double vA, double vB) {
         this.previousVoltageDiff = vA - vB;
     }
 
     @Override
     public void UpdateState(double deltaTime) {
-        // This is a placeholder for the general ISimulatable call
+        // If it's already broken, we stop processing it
+        if (isBroken) return;
+
+        // Instant pop logic
+        if (Math.abs(previousVoltageDiff) > VOLTAGE_LIMIT) {
+            this.isBroken = true;
+            // You might trigger a visual change here, e.g., set image to 'broken.png'
+            System.out.println(this.componentName + " popped instantly!");
+        }
     }
 
     @Override

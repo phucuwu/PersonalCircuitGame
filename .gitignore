@@ -1,5 +1,2 @@
-# Java compiled files
-*.class
-
-# Maven/Gradle build output
 target/
+*.class
