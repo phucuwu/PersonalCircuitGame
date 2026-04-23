@@ -1,5 +1,6 @@
 package com.javasim.view;
 
+import com.javasim.model.Bulb;
 import com.javasim.model.Component;
 
 import javafx.scene.layout.StackPane;
@@ -24,6 +25,12 @@ public class ComponentView extends StackPane {
     }
 
     public void Refresh() {
-        // We'll add logic here to change colors/text later
+        // Visual feedback based on component state
+        if (model instanceof Bulb) {
+            Bulb bulb = (Bulb) model;
+            shape.setFill(bulb.IsLit() ? Color.YELLOW : Color.LIGHTGRAY); //
+        }
+        
+        // You can extend this to show voltage text or 'broken' states
     }
 }
