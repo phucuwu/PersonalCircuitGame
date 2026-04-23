@@ -101,40 +101,37 @@ public class App extends Application {
             view.GetPin1().setOnMouseClicked(e -> handlePinClick(view, 1, root, graph));
         }
     }
-
     private void handlePinClick(ComponentView view, int pinIndex, Pane root, CircuitGraph graph) {
-        if (selectedPin == null) {
-            selectedView = view;
-            selectedPinIndex = pinIndex;
-            selectedPin = (pinIndex == 0) ? view.GetPin0() : view.GetPin1();
-            selectedPin.setFill(Color.RED);
-        } else {
-            if (selectedView != view) {
-                Line wire = new Line();
-                
-                // Snap points to the pins
-                double startX = selectedView.getLayoutX() + (selectedPinIndex == 0 ? 0 : 60);
-                double startY = selectedView.getLayoutY() + 20;
-                double endX = view.getLayoutX() + (pinIndex == 0 ? 0 : 60);
-                double endY = view.getLayoutY() + 20;
-                
-                wire.setStartX(startX);
-                wire.setStartY(startY);
-                wire.setEndX(endX);
-                wire.setEndY(endY);
-                wire.setStrokeWidth(2);
-                
-                root.getChildren().add(wire);
-                wire.toBack(); 
+    if (selectedPin == null) {
+        selectedView = view;
+        selectedPinIndex = pinIndex;
+        selectedPin = (pinIndex == 0) ? view.GetPin0() : view.GetPin1();
+        selectedPin.setFill(Color.RED);
+    } else {
+        if (selectedView != view) {
+            Line wire = new Line();
+            wire.setStrokeWidth(2);
 
-                graph.GetNodeManager().Connect(selectedView.GetModel(), selectedPinIndex, view.GetModel(), pinIndex);
-            }
-            
-            selectedPin.setFill(Color.BLACK);
-            selectedPin = null;
-            selectedView = null;
+            // BIND start of the wire to the first component
+            wire.startXProperty().bind(selectedView.layoutXProperty().add(selectedPinIndex == 0 ? 0 : 60));
+            wire.startYProperty().bind(selectedView.layoutYProperty().add(20));
+
+            // BIND end of the wire to the second component
+            wire.endXProperty().bind(view.layoutXProperty().add(pinIndex == 0 ? 0 : 60));
+            wire.endYProperty().bind(view.layoutYProperty().add(20));
+
+            root.getChildren().add(wire);
+            wire.toBack(); 
+
+            // Log and connect
+            graph.GetNodeManager().Connect(selectedView.GetModel(), selectedPinIndex, view.GetModel(), pinIndex);
         }
+        
+        selectedPin.setFill(Color.BLACK);
+        selectedPin = null;
+        selectedView = null;
     }
+}
 
     public static void main(String[] args) {
         launch();
