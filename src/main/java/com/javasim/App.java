@@ -6,8 +6,10 @@ import java.util.List;
 import com.javasim.controller.SimulationController;
 import com.javasim.model.CircuitGraph;
 import com.javasim.model.Resistor;
+import com.javasim.model.Switch;
 import com.javasim.model.VoltageSource;
 import com.javasim.view.ComponentView;
+import com.javasim.view.SwitchView;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -49,6 +51,20 @@ public class App extends Application {
         ComponentView resistorView = new ComponentView(resistor);
         resistorView.setLayoutX(300);
         resistorView.setLayoutY(100);
+
+        // 1. Setup Model
+        Switch mainSwitch = new Switch("SW1");
+        graph.AddComponent(mainSwitch);
+
+        // 2. Setup View
+        SwitchView switchView = new SwitchView(mainSwitch);
+        switchView.setLayoutX(200);
+        switchView.setLayoutY(150);
+        viewList.add(switchView);
+        root.getChildren().add(switchView);
+
+        // 3. Setup Interaction (Ensure this is called after adding to viewList)
+        SetupWiringInteraction(root, viewList, graph);
         
         viewList.add(batteryView);
         viewList.add(resistorView);
