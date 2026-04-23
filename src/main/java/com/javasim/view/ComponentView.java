@@ -5,6 +5,7 @@ import com.javasim.model.Component;
 
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
@@ -12,6 +13,10 @@ public class ComponentView extends StackPane {
     protected Component model;
     protected Rectangle shape;
     protected Text label;
+    
+    // Add two circles to represent Pin 0 and Pin 1
+    protected Circle pinLeft;
+    protected Circle pinRight;
 
     public ComponentView(Component model) {
         this.model = model;
@@ -21,8 +26,20 @@ public class ComponentView extends StackPane {
         
         this.label = new Text(model.GetName());
         
-        this.getChildren().addAll(shape, label);
+        // Setup Pins
+        this.pinLeft = new Circle(5, Color.BLACK);
+        this.pinRight = new Circle(5, Color.BLACK);
+        
+        // Position pins relative to the center of the 60x40 rectangle
+        pinLeft.setTranslateX(-30);
+        pinRight.setTranslateX(30);
+
+        this.getChildren().addAll(shape, label, pinLeft, pinRight);
     }
+
+    public Circle GetPin0() { return pinLeft; }
+    public Circle GetPin1() { return pinRight; }
+    public Component GetModel() { return model; }
 
     public void Refresh() {
         // Visual feedback based on component state
