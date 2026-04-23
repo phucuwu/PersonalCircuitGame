@@ -19,6 +19,7 @@ public class CircuitGraph {
 
     public void AddComponent(Component comp) {
         components.add(comp);
+        System.out.println("[LOG] Component added: " + comp.GetName()); // cite: 13, 8
     }
 
     public NodeManager GetNodeManager() {

@@ -9,7 +9,7 @@ import java.util.Set;
 public class NodeManager {
     private List<Set<PinReference>> nets;
     private Set<PinReference> groundPins;
-
+    private int lastKnownNodeCount = 0;
     public NodeManager() {
         this.nets = new ArrayList<>();
         this.groundPins = new HashSet<>();
@@ -19,6 +19,8 @@ public class NodeManager {
      * Connects two specific pins together.
      */
     public void Connect(Component c1, int p1, Component c2, int p2) {
+        System.out.println("[LOG] Connecting " + c1.GetName() + " (Pin " + p1 + ") to " + 
+                       c2.GetName() + " (Pin " + p2 + ")"); // cite: 8
         PinReference ref1 = new PinReference(c1, p1);
         PinReference ref2 = new PinReference(c2, p2);
 
@@ -45,20 +47,21 @@ public class NodeManager {
      */
     public void SetAsGround(Component comp, int pinIndex) {
         groundPins.add(new PinReference(comp, pinIndex));
+        System.out.println("[LOG] " + comp.GetName() + " (Pin " + pinIndex + ") designated as Ground."); // cite: 8
     }
 
-    /**
-     * Assigns final integer IDs to all component pins based on connections.
-     * Returns the total number of unique nodes (excluding ground).
-     */
-    public int UpdateComponentNodes(List<Component> components) {
+        /**
+         * Assigns final integer IDs to all component pins based on connections.
+         * Returns the total number of unique nodes (excluding ground).
+         */
+        public int UpdateComponentNodes(List<Component> components) {
         // 1. Ensure all pins have a default ID (isolated pins get unique IDs)
-        for (Component c : components) {
-            int[] ids = c.GetNodeIds();
-            for (int i = 0; i < ids.length; i++) {
-                ids[i] = -1; 
+            for (Component c : components) {
+                int[] ids = c.GetNodeIds();
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = -1; 
+                }
             }
-        }
 
         // 2. Identify the Ground Net
         Set<PinReference> groundNet = null;
@@ -82,7 +85,16 @@ public class NodeManager {
             }
         }
         
-        return nextId - 1;
+        int totalNodes = nextId - 1;
+    
+    if (totalNodes > lastKnownNodeCount) {
+        System.out.println("[LOG] New nodes created. Total active nodes: " + totalNodes);
+    } else if (totalNodes < lastKnownNodeCount) {
+        System.out.println("[LOG] Nodes merged or removed. Total active nodes: " + totalNodes);
+    }
+    
+    lastKnownNodeCount = totalNodes;
+    return totalNodes;
     }
 
     private Set<PinReference> FindNet(PinReference ref) {
