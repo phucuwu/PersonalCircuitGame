@@ -10,6 +10,7 @@ import com.javasim.model.interfaces.IElectrical;
 public class CircuitGraph {
     private List<Component> components;
     private NodeManager nodeManager;
+    private String lastErrorMessage = "";
 
     public CircuitGraph() {
         this.components = new ArrayList<>();
@@ -24,37 +25,75 @@ public class CircuitGraph {
         return nodeManager;
     }
 
+   /**
+     * Validates if the circuit is solvable.
+     * @return true if valid, false otherwise.
+     */
+    public boolean Validate() {
+        if (components.isEmpty()) {
+            lastErrorMessage = "Circuit is empty.";
+            return false;
+        }
+
+        // Must have a ground reference for MNA to work
+        if (!nodeManager.HasGround()) {
+            lastErrorMessage = "Missing Ground! Please connect a component to Node 0.";
+            return false;
+        }
+
+        // Basic check: Are there any voltage sources or powered elements?
+        boolean hasSource = components.stream().anyMatch(c -> c instanceof VoltageSource);
+        if (!hasSource) {
+            lastErrorMessage = "Warning: No power source detected.";
+            // We return true here because a dead circuit is physically "valid," 
+            // but the warning helps the user.
+        }
+
+        lastErrorMessage = "";
+        return true;
+    }
+
+    public String GetLastErrorMessage() {
+        return lastErrorMessage;
+    }
+
     public void SolveCircuit(double deltaTime) {
-        // 1. Update IDs and get dynamic counts
+        // --- NEW VALIDATION CHECK ---
+        if (!Validate()) {
+            // If invalid, we set all currents to zero to stop "ghost" animations
+            for (Component c : components) c.SetCalculatedCurrent(0);
+            return;
+        }
+
         int nodeCount = nodeManager.UpdateComponentNodes(components);
         int sourceCount = 0;
         
         for (Component comp : components) {
             if (comp instanceof VoltageSource) {
-                // Update the sourceIndex dynamically to match its position in the 'extra' matrix part
-                ((VoltageSource) comp).SetSourceIndex(sourceCount++); 
+                ((VoltageSource) comp).SetSourceIndex(sourceCount++);
             }
         }
 
         int matrixSize = nodeCount + sourceCount;
-        if (matrixSize == 0) return;
-
         double[][] A = new double[matrixSize][matrixSize];
         double[] b = new double[matrixSize];
 
-        // 2. Stamp components
         for (Component comp : components) {
             if (comp instanceof IElectrical) {
                 ((IElectrical) comp).ApplyToMatrix(A, b, deltaTime);
             }
         }
 
-        // 3. Solve and Sync
         double[] solution = MatrixSolver.Solve(A, b);
-        SyncPhysicsState(solution, deltaTime);
+        
+        // If the solver failed due to a singular matrix (e.g., short circuit)
+        if (solution == null) {
+            lastErrorMessage = "Singular Matrix: Possible short circuit detected!";
+            return;
+        }
+
         UpdatePhysicsAndCurrents(solution, nodeCount, deltaTime);
     }
-
     private void SyncPhysicsState(double[] solution, double deltaTime) {
         for (Component comp : components) {
             int[] nodes = comp.GetNodeIds();

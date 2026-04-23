@@ -124,4 +124,18 @@ public class NodeManager {
             return Objects.hash(ComponentRef, PinIndex);
         }
     }
+    public boolean HasGround() {
+    // Check if any pins were explicitly set as ground
+    if (!groundPins.isEmpty()) return true;
+
+    // Alternatively, check if any net was assigned ID 0 during UpdateComponentNodes
+    for (Set<PinReference> net : nets) {
+        for (PinReference ref : net) {
+            if (ref.ComponentRef.GetNodeIds()[ref.PinIndex] == 0) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 }
