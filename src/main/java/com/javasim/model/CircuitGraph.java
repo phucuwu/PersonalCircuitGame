@@ -94,21 +94,7 @@ public class CircuitGraph {
 
         UpdatePhysicsAndCurrents(solution, nodeCount, deltaTime);
     }
-    private void SyncPhysicsState(double[] solution, double deltaTime) {
-        for (Component comp : components) {
-            int[] nodes = comp.GetNodeIds();
-            double vA = (nodes[0] > 0) ? solution[nodes[0] - 1] : 0.0;
-            double vB = (nodes[1] > 0) ? solution[nodes[1] - 1] : 0.0;
 
-            if (comp instanceof Capacitor) {
-                ((Capacitor) comp).RecordPhysicsState(vA, vB);
-            } else if (comp instanceof Inductor) {
-                ((Inductor) comp).UpdateCurrent(vA, vB, deltaTime);
-            } else if (comp instanceof Bulb) {
-                ((Bulb) comp).CheckStatus(vA, vB);
-            }
-        }
-    }
     private void UpdatePhysicsAndCurrents(double[] solution, int nodeCount, double deltaTime) {
         for (Component comp : components) {
             int[] nodes = comp.GetNodeIds();
