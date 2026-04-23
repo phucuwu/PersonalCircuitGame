@@ -29,4 +29,8 @@ public class VoltageSource extends Component implements IElectrical {
 
         rhsVector[k] = componentValue;
     }
+
+    public void SetSourceIndex(int index) {
+        this.sourceIndex = index;
+    }
 }
