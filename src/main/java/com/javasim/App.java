@@ -84,45 +84,45 @@ public class App extends Application {
 
     // src/main/java/com/javasim/App.java
 
-private Circle selectedPin = null;
-private ComponentView selectedView = null;
-private int selectedPinIndex = -1;
+    private Circle selectedPin = null;
+    private ComponentView selectedView = null;
+    private int selectedPinIndex = -1;
 
-private void SetupWiringInteraction(Pane root, List<ComponentView> viewList, CircuitGraph graph) {
-    for (ComponentView view : viewList) {
-        // Setup for Pin 0 (Left)
-        view.GetPin0().setOnMouseClicked(e -> handlePinClick(view, 0, root, graph));
+    private void SetupWiringInteraction(Pane root, List<ComponentView> viewList, CircuitGraph graph) {
+        for (ComponentView view : viewList) {
+            // Setup for Pin 0 (Left)
+            view.GetPin0().setOnMouseClicked(e -> handlePinClick(view, 0, root, graph));
         
-        // Setup for Pin 1 (Right)
-        view.GetPin1().setOnMouseClicked(e -> handlePinClick(view, 1, root, graph));
-    }
-}
-
-private void handlePinClick(ComponentView view, int pinIndex, Pane root, CircuitGraph graph) {
-    if (selectedPin == null) {
-        // First pin clicked: Start the wire
-        selectedView = view;
-        selectedPinIndex = pinIndex;
-        selectedPin = (pinIndex == 0) ? view.GetPin0() : view.GetPin1();
-        selectedPin.setFill(Color.RED); // Highlight the start
-    } else {
-        // Second pin clicked: Finish the wire
-        if (selectedView != view) { // Prevent connecting a component to itself
-            // 1. Draw the visual wire
-            javafx.scene.shape.Line wire = new javafx.scene.shape.Line();
-            
-            // Calculate global positions for the line
-            wire.setStartX(selectedView.getLayoutX() + selectedPin.getTranslateX() + 30);
-            wire.setStartY(selectedView.getLayoutY() + selectedPin.getTranslateY() + 20);
-            wire.setEndX(view.getLayoutX() + ((pinIndex == 0) ? -30 : 30) + 30);
-            wire.setEndY(view.getLayoutY() + 20);
-            
-            root.getChildren().add(wire);
-            wire.toBack(); // Put wires behind components
-
-            // 2. Connect in the Backend Logic
-            graph.GetNodeManager().Connect(selectedView.GetModel(), selectedPinIndex, view.GetModel(), pinIndex);
+            // Setup for Pin 1 (Right)
+            view.GetPin1().setOnMouseClicked(e -> handlePinClick(view, 1, root, graph));
         }
+    }
+
+    private void handlePinClick(ComponentView view, int pinIndex, Pane root, CircuitGraph graph) {
+        if (selectedPin == null) {
+            // First pin clicked: Start the wire
+            selectedView = view;
+            selectedPinIndex = pinIndex;
+            selectedPin = (pinIndex == 0) ? view.GetPin0() : view.GetPin1();
+            selectedPin.setFill(Color.RED); // Highlight the start
+        } else {
+            // Second pin clicked: Finish the wire
+            if (selectedView != view) { // Prevent connecting a component to itself
+                // 1. Draw the visual wire
+                javafx.scene.shape.Line wire = new javafx.scene.shape.Line();
+            
+                // Calculate global positions for the line
+                wire.setStartX(selectedView.getLayoutX() + selectedPin.getTranslateX() + 30);
+                wire.setStartY(selectedView.getLayoutY() + selectedPin.getTranslateY() + 20);
+                wire.setEndX(view.getLayoutX() + ((pinIndex == 0) ? -30 : 30) + 30);
+                wire.setEndY(view.getLayoutY() + 20);
+            
+                root.getChildren().add(wire);
+                wire.toBack(); // Put wires behind components
+
+                // 2. Connect in the Backend Logic
+                graph.GetNodeManager().Connect(selectedView.GetModel(), selectedPinIndex, view.GetModel(), pinIndex);
+            }   
         
         // Reset selection
         selectedPin.setFill(Color.BLACK);
