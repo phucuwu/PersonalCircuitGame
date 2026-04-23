@@ -1,10 +1,12 @@
 package com.javasim.controller;
 
-import com.javasim.model.*;
-import com.javasim.model.interfaces.ISimulatable;
-import javafx.animation.AnimationTimer;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.javasim.model.CircuitGraph;
+import com.javasim.model.interfaces.ISimulatable;
+
+import javafx.animation.AnimationTimer;
 
 public class SimulationController {
     private CircuitGraph circuitGraph;
@@ -33,6 +35,7 @@ public class SimulationController {
                 // 1. Solve the Physics
                 // We run multiple steps per frame if needed for high precision
                 circuitGraph.SolveCircuit(deltaTime);
+                UpdateView();
 
                 // 2. Update logic (pops, etc.)
                 for (ISimulatable comp : simulatableComponents) {
@@ -51,7 +54,7 @@ public class SimulationController {
         isRunning = false;
     }
 
-    private void UpdateView() {
+    protected void UpdateView() {
         // Logic to update JavaFX UI elements based on new Model values
     }
 }
