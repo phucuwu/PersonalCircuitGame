@@ -35,7 +35,9 @@ public class MatrixSolver {
 
             // Make pivot 1
             double pivot = augmented[i][i];
-            if (Math.abs(pivot) < 1e-12) continue; // Singular matrix check
+            if (Math.abs(pivot) < 1e-12) {
+                return null; // Matrix is singular, cannot solve
+        }
 
             for (int j = i; j <= n; j++) {
                 augmented[i][j] /= pivot;
