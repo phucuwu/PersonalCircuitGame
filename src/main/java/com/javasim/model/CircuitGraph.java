@@ -52,6 +52,7 @@ public class CircuitGraph {
         // 3. Solve and Sync
         double[] solution = MatrixSolver.Solve(A, b);
         SyncPhysicsState(solution, deltaTime);
+        UpdatePhysicsAndCurrents(solution, nodeCount, deltaTime);
     }
 
     private void SyncPhysicsState(double[] solution, double deltaTime) {
@@ -66,6 +67,44 @@ public class CircuitGraph {
                 ((Inductor) comp).UpdateCurrent(vA, vB, deltaTime);
             } else if (comp instanceof Bulb) {
                 ((Bulb) comp).CheckStatus(vA, vB);
+            }
+        }
+    }
+    private void UpdatePhysicsAndCurrents(double[] solution, int nodeCount, double deltaTime) {
+        for (Component comp : components) {
+            int[] nodes = comp.GetNodeIds();
+            double vA = (nodes[0] > 0) ? solution[nodes[0] - 1] : 0.0;
+            double vB = (nodes[1] > 0) ? solution[nodes[1] - 1] : 0.0;
+            double vDiff = vA - vB;
+
+            if (comp instanceof Resistor) {
+                // I = V / R
+                double current = (comp.GetValue() != 0) ? vDiff / comp.GetValue() : 0;
+                comp.SetCalculatedCurrent(current);
+
+                if (comp instanceof Bulb) {
+                    ((Bulb) comp).CheckStatus(vA, vB);
+                }
+            } 
+            else if (comp instanceof VoltageSource) {
+                // In MNA, the current of the k-th source is at solution[nodeCount + k]
+                int k = ((VoltageSource) comp).GetSourceIndex();
+                // We use the negative because the solver usually treats source current as entering the node
+                comp.SetCalculatedCurrent(-solution[nodeCount + k]);
+            } 
+            else if (comp instanceof Capacitor) {
+                // I = C * dv/dt (In companion model: I = G * (V_curr - V_prev))
+                Capacitor cap = (Capacitor) comp;
+                double conductance = cap.GetValue() / deltaTime;
+                double current = conductance * (vDiff - cap.GetPreviousVoltageDiff());
+                cap.SetCalculatedCurrent(current);
+                cap.RecordPhysicsState(vA, vB);
+            } 
+            else if (comp instanceof Inductor) {
+                // Update logic already exists in your Inductor.java
+                Inductor ind = (Inductor) comp;
+                ind.UpdateCurrent(vA, vB, deltaTime);
+                comp.SetCalculatedCurrent(ind.GetPreviousCurrent());
             }
         }
     }

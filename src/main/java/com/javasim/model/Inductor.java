@@ -42,4 +42,8 @@ public class Inductor extends Component implements IElectrical, ISimulatable {
     public void ResetState() {
         this.previousCurrent = 0.0;
     }
+
+    public double GetPreviousCurrent() {
+        return this.previousCurrent;
+    }
 }

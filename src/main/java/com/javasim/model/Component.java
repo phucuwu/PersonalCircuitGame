@@ -4,6 +4,7 @@ public abstract class Component {
     protected String componentName;
     protected double componentValue;
     protected int[] nodeIds;
+    protected double calculatedCurrent = 0.0; // New field
 
     public Component(String name, double value, int pinCount) {
         this.componentName = name;
@@ -17,6 +18,13 @@ public abstract class Component {
 
     public double GetValue() {
         return componentValue;
+    }
+    public double GetCalculatedCurrent() {
+        return calculatedCurrent;
+    }
+
+    public void SetCalculatedCurrent(double current) {
+        this.calculatedCurrent = current;
     }
 
     public void SetValue(double newValue) {

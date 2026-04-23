@@ -33,4 +33,7 @@ public class VoltageSource extends Component implements IElectrical {
     public void SetSourceIndex(int index) {
         this.sourceIndex = index;
     }
+    public int GetSourceIndex() {
+        return this.sourceIndex;
+    }
 }

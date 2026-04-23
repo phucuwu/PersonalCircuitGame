@@ -54,4 +54,8 @@ public class Capacitor extends Component implements IElectrical, ISimulatable {
     public void ResetState() {
         this.previousVoltageDiff = 0.0;
     }
+
+    public double GetPreviousVoltageDiff() {
+        return this.previousVoltageDiff;
+    }
 }
