@@ -13,6 +13,7 @@ public class ComponentView extends StackPane {
     protected Component model;
     protected Rectangle shape;
     protected Text label;
+    protected Text dataOverlay; // New field for current/voltage display
     protected Circle pinLeft;
     protected Circle pinRight;
 
@@ -34,6 +35,12 @@ public class ComponentView extends StackPane {
         pinRight.setTranslateX(30);
 
         this.getChildren().addAll(shape, label, pinLeft, pinRight);
+
+        this.dataOverlay = new Text("");
+        this.dataOverlay.setFill(Color.BLUE);
+        this.dataOverlay.setTranslateY(35); // Position below the component
+        
+        this.getChildren().add(dataOverlay);
         
         // Enable dragging by default
         EnableDrag();
@@ -64,6 +71,19 @@ public class ComponentView extends StackPane {
             Bulb bulb = (Bulb) model;
             shape.setFill(bulb.IsLit() ? Color.YELLOW : Color.LIGHTGRAY); //
         }
+        double current = model.GetCalculatedCurrent();
+    
+        // 2. Update Overlay String
+        // We use String.format to keep it to 2 decimal places
+        String info = String.format("%.2f A", current);
+        dataOverlay.setText(info);
+
+        // 3. Special Logic for Bulbs (if this instance is a bulb)
+        if (model instanceof Bulb && ((Bulb) model).IsLit()) {
+            this.shape.setFill(Color.YELLOW);
+        } else if (model instanceof Bulb) {
+            this.shape.setFill(Color.LIGHTGRAY);
+    }
         
         // You can extend this to show voltage text or 'broken' states
     }
