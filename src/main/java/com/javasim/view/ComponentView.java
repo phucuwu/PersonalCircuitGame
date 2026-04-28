@@ -64,6 +64,7 @@ public class ComponentView extends StackPane {
     public Circle GetPin0() { return pinLeft; }
     public Circle GetPin1() { return pinRight; }
     public Component GetModel() { return model; }
+    public Rectangle GetVisualShape() { return this.shape; }
 
     public void Refresh() {
         // Visual feedback based on component state
