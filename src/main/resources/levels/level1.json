@@ -1,0 +1,12 @@
+{
+  "levelId": 1,
+  "title": "First Light",
+  "description": "Wire the components together to turn the light bulb on.",
+  "componentInventory": {
+    "VoltageSource": 1,
+    "Resistor": 1,
+    "Switch": 1,
+    "Bulb": 1
+  },
+  "requiresBulbLit": true
+}
