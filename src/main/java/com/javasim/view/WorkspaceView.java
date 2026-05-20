@@ -82,6 +82,18 @@ public class WorkspaceView extends Pane {
         }
     }
 
+    public void ClearWorkspace() {
+        this.viewList.clear();
+        // Remove everything except the HUD (if it's the first child, or you can just clear all and rebuild HUD)
+        this.getChildren().clear(); 
+        
+        // Reset wiring states
+        this.selectedPin = null;
+        this.wiringSourceView = null;
+        this.selectedPinIndex = -1;
+        System.out.println("[VIEW] Workspace cleared.");
+    }
+
     public void RefreshAllViews() {
         for (ComponentView v : viewList) {
             v.Refresh();

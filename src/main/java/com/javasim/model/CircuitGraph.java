@@ -137,4 +137,11 @@ public class CircuitGraph {
             }
         }
     }
+
+    public void ClearGraph() {
+        this.components.clear();
+        this.nodeManager = new NodeManager(); // Resets all pins and nets
+        this.lastErrorMessage = "";
+        System.out.println("[PHYSICS] CircuitGraph cleared.");
+    }
 }
