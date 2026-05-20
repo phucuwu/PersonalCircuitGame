@@ -1,51 +1,47 @@
 // src/main/java/com/javasim/game/LevelManager.java
 package com.javasim.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.javasim.model.Bulb;
+import com.google.gson.Gson;
 import com.javasim.model.CircuitGraph;
 import com.javasim.model.Component;
+import com.javasim.model.Bulb;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 public class LevelManager {
     private PuzzleLevel currentLevel;
     private boolean isLevelCompleted = false;
+    private Gson gson;
+
+    public LevelManager() {
+        this.gson = new Gson();
+    }
 
     public void LoadLevel(int levelId) {
         this.isLevelCompleted = false;
         
-        if (levelId == 1) {
-            Map<String, Integer> inventory = new HashMap<>();
-            inventory.put("VoltageSource", 1); // Only 1 Battery allowed
-            inventory.put("Resistor", 1);      // Only 1 Resistor allowed
-            inventory.put("Switch", 1);        // Only 1 Switch allowed
-            inventory.put("Bulb", 1);          // Only 1 Bulb allowed
+        try {
+            // Locate the file in the resources/levels folder
+            String fileName = "/levels/level" + levelId + ".json";
+            InputStream inputStream = getClass().getResourceAsStream(fileName);
 
-            currentLevel = new PuzzleLevel(
-                1, 
-                "First Light", 
-                "Wire the components together to turn the light bulb on.", 
-                inventory, 
-                true
-            );
-        }
-        else if (levelId == 2) {
-            Map<String, Integer> inventory = new HashMap<>();
-            inventory.put("VoltageSource", 1);
-            inventory.put("Resistor", 2); // 2 Resistors!
-            inventory.put("Switch", 1);
-            inventory.put("Bulb", 1);
+            if (inputStream == null) {
+                System.out.println("[GAME] Could not find " + fileName + ". You beat the game!");
+                currentLevel = null;
+                return;
+            }
 
-            currentLevel = new PuzzleLevel(
-                2, 
-                "Voltage Divider", 
-                "The battery is too strong! Use resistors to drop the voltage so the bulb doesn't pop.", 
-                inventory, 
-                true
-            );
+            // Read the JSON and magically convert it into our Java object
+            Reader reader = new InputStreamReader(inputStream);
+            currentLevel = gson.fromJson(reader, PuzzleLevel.class);
+            
+            System.out.println("[GAME] Loaded Level " + levelId + ": " + currentLevel.GetTitle());
+
+        } catch (Exception e) {
+            System.err.println("[ERROR] Failed to load level: " + e.getMessage());
         }
-        System.out.println("[GAME] Loaded Level: " + currentLevel.GetTitle());
     }
 
     public PuzzleLevel GetCurrentLevel() { 
@@ -55,7 +51,6 @@ public class LevelManager {
     public boolean CheckWinCondition(CircuitGraph graph) {
         if (currentLevel == null || isLevelCompleted) return false;
 
-        // Win Condition: Is the bulb lit?
         if (currentLevel.RequiresBulbLit()) {
             for (Component c : graph.GetComponents()) {
                 if (c instanceof Bulb && ((Bulb) c).IsLit()) {
@@ -71,6 +66,4 @@ public class LevelManager {
     public boolean IsLevelCompleted() {
         return isLevelCompleted;
     }
-
-    
 }

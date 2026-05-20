@@ -10,21 +10,16 @@ public class PuzzleLevel {
     private Map<String, Integer> componentInventory;
     private boolean requiresBulbLit;
 
-    public PuzzleLevel(int levelId, String title, String description, Map<String, Integer> inventory, boolean requiresBulbLit) {
-        this.levelId = levelId;
-        this.title = title;
-        this.description = description;
-        this.componentInventory = inventory;
-        this.requiresBulbLit = requiresBulbLit;
-    }
+    // Gson needs a default constructor to build the object
+    public PuzzleLevel() {}
 
+    public int GetLevelId() { return levelId; }
     public String GetTitle() { return title; }
     public String GetDescription() { return description; }
-    public int GetLevelId() { return levelId; }
     public boolean RequiresBulbLit() { return requiresBulbLit; }
     
-    // Returns how many of a specific component the player is allowed to use
     public int GetAvailableCount(String componentType) {
+        if (componentInventory == null) return 0;
         return componentInventory.getOrDefault(componentType, 0);
     }
 }

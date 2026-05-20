@@ -17,7 +17,7 @@ public class InspectorView extends VBox {
 
     public InspectorView() {
         this.setPrefWidth(200);
-        this.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 15; -fx-border-left: 2px solid #ddd;");        
+        this.setStyle("-fx-background-color: #f4f4f4; -fx-padding: 15; -fx-border-color: #ddd; -fx-border-width: 0 0 0 2;");        
         this.getChildren().add(new Text("Properties Inspector"));
     }
 
