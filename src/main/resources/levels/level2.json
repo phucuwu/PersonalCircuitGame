@@ -1,0 +1,12 @@
+{
+  "levelId": 2,
+  "title": "Voltage Divider",
+  "description": "The battery is too strong! Use 2 resistors to drop the voltage so the bulb doesn't pop.",
+  "componentInventory": {
+    "VoltageSource": 1,
+    "Resistor": 2,
+    "Switch": 1,
+    "Bulb": 1
+  },
+  "requiresBulbLit": true
+}
