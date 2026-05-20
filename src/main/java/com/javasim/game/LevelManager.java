@@ -30,6 +30,21 @@ public class LevelManager {
                 true
             );
         }
+        else if (levelId == 2) {
+            Map<String, Integer> inventory = new HashMap<>();
+            inventory.put("VoltageSource", 1);
+            inventory.put("Resistor", 2); // 2 Resistors!
+            inventory.put("Switch", 1);
+            inventory.put("Bulb", 1);
+
+            currentLevel = new PuzzleLevel(
+                2, 
+                "Voltage Divider", 
+                "The battery is too strong! Use resistors to drop the voltage so the bulb doesn't pop.", 
+                inventory, 
+                true
+            );
+        }
         System.out.println("[GAME] Loaded Level: " + currentLevel.GetTitle());
     }
 
@@ -56,4 +71,6 @@ public class LevelManager {
     public boolean IsLevelCompleted() {
         return isLevelCompleted;
     }
+
+    
 }

@@ -11,6 +11,7 @@ import com.javasim.view.WorkspaceView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -45,6 +46,8 @@ public class App extends Application {
         mainLayout.getChildren().addAll(toolbox, workspace, inspector);
 
         // --- 3. START GAME LOOP ---
+        // Replace the SimulationController section in App.java with this:
+
         SimulationController controller = new SimulationController(graph) {
             @Override
             public void UpdateView() {
@@ -52,13 +55,47 @@ public class App extends Application {
                 
                 // Check if puzzle is solved on this frame
                 if (levelManager.CheckWinCondition(graph)) {
+                    // Pause the simulation so it doesn't keep triggering
+                    this.StopSimulation(); 
+                    
                     Platform.runLater(() -> {
+                        // Create a "Next Level" Menu Overlay
+                        VBox winMenu = new VBox(20);
+                        winMenu.setStyle("-fx-background-color: rgba(255, 255, 255, 0.9); -fx-padding: 40; -fx-border-color: green; -fx-border-width: 5;");
+                        winMenu.setLayoutX(250);
+                        winMenu.setLayoutY(200);
+
                         Text winText = new Text("LEVEL COMPLETE!");
-                        winText.setFont(new Font("Arial", 48));
+                        winText.setFont(new Font("Arial", 36));
                         winText.setStyle("-fx-fill: green; -fx-font-weight: bold;");
-                        winText.setLayoutX(200);
-                        winText.setLayoutY(300);
-                        workspace.getChildren().add(winText);
+
+                        Button nextLevelBtn = new Button("Play Next Level");
+                        nextLevelBtn.setStyle("-fx-font-size: 18px; -fx-padding: 10 20;");
+                        
+                        nextLevelBtn.setOnAction(e -> {
+                            // 1. Clean up
+                            graph.ClearGraph();
+                            workspace.ClearWorkspace();
+                            
+                            // 2. Load next level
+                            int nextId = levelManager.GetCurrentLevel().GetLevelId() + 1; // Assuming you add GetLevelId() to PuzzleLevel
+                            levelManager.LoadLevel(nextId);
+                            
+                            // 3. Rebuild HUD
+                            Text levelTitle = new Text("Level " + nextId + ": " + levelManager.GetCurrentLevel().GetTitle());
+                            levelTitle.setFont(new Font("Arial", 18));
+                            Text levelDesc = new Text(levelManager.GetCurrentLevel().GetDescription());
+                            VBox hud = new VBox(5, levelTitle, levelDesc);
+                            hud.setLayoutX(20);
+                            hud.setLayoutY(20);
+                            workspace.getChildren().add(hud);
+
+                            // 4. Resume Game
+                            this.StartSimulation();
+                        });
+
+                        winMenu.getChildren().addAll(winText, nextLevelBtn);
+                        workspace.getChildren().add(winMenu);
                     });
                 }
             }

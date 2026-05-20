@@ -20,6 +20,7 @@ public class PuzzleLevel {
 
     public String GetTitle() { return title; }
     public String GetDescription() { return description; }
+    public int GetLevelId() { return levelId; }
     public boolean RequiresBulbLit() { return requiresBulbLit; }
     
     // Returns how many of a specific component the player is allowed to use
