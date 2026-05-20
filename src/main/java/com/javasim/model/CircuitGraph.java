@@ -95,6 +95,9 @@ public class CircuitGraph {
 
         UpdatePhysicsAndCurrents(solution, nodeCount, deltaTime);
     }
+    public java.util.List<Component> GetComponents() {
+        return this.components;
+    }
 
     private void UpdatePhysicsAndCurrents(double[] solution, int nodeCount, double deltaTime) {
         for (Component comp : components) {
