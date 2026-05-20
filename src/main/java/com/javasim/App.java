@@ -73,27 +73,38 @@ public class App extends Application {
                         nextLevelBtn.setStyle("-fx-font-size: 18px; -fx-padding: 10 20;");
                         
                         nextLevelBtn.setOnAction(e -> {
-                            // 1. Clean up
+                            // 1. Clean up the board
                             graph.ClearGraph();
                             workspace.ClearWorkspace();
                             
                             // 2. Load next level
-                            int nextId = levelManager.GetCurrentLevel().GetLevelId() + 1; // Assuming you add GetLevelId() to PuzzleLevel
+                            int nextId = levelManager.GetCurrentLevel().GetLevelId() + 1;
                             levelManager.LoadLevel(nextId);
                             
-                            // 3. Rebuild HUD
+                            // --- NEW SAFETY CHECK: DID WE BEAT THE GAME? ---
+                            if (levelManager.GetCurrentLevel() == null) {
+                                Text ggText = new Text("CONGRATULATIONS!\nYou beat all available levels!");
+                                ggText.setFont(new Font("Arial", 36));
+                                ggText.setStyle("-fx-fill: blue; -fx-text-alignment: center;");
+                                ggText.setLayoutX(150);
+                                ggText.setLayoutY(250);
+                                workspace.getChildren().add(ggText);
+                                return; // Stop executing, leave the game paused
+                            }
+                            // -----------------------------------------------
+
+                            // 3. Rebuild HUD for the new level
                             Text levelTitle = new Text("Level " + nextId + ": " + levelManager.GetCurrentLevel().GetTitle());
                             levelTitle.setFont(new Font("Arial", 18));
                             Text levelDesc = new Text(levelManager.GetCurrentLevel().GetDescription());
-                            VBox hud = new VBox(5, levelTitle, levelDesc);
-                            hud.setLayoutX(20);
-                            hud.setLayoutY(20);
-                            workspace.getChildren().add(hud);
+                            VBox newHud = new VBox(5, levelTitle, levelDesc);
+                            newHud.setLayoutX(20);
+                            newHud.setLayoutY(20);
+                            workspace.getChildren().add(newHud);
 
                             // 4. Resume Game
                             this.StartSimulation();
                         });
-
                         winMenu.getChildren().addAll(winText, nextLevelBtn);
                         workspace.getChildren().add(winMenu);
                     });
