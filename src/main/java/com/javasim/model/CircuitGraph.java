@@ -70,8 +70,8 @@ public class CircuitGraph {
         int sourceCount = 0;
         
         for (Component comp : components) {
-            if (comp instanceof VoltageSource) {
-                ((VoltageSource) comp).SetSourceIndex(sourceCount++);
+            if (comp instanceof VoltageSource voltageSource) {
+                voltageSource.SetSourceIndex(sourceCount++);
             }
         }
 
@@ -80,8 +80,8 @@ public class CircuitGraph {
         double[] b = new double[matrixSize];
 
         for (Component comp : components) {
-            if (comp instanceof IElectrical) {
-                ((IElectrical) comp).ApplyToMatrix(A, b, deltaTime);
+            if (comp instanceof IElectrical iElectrical) {
+                iElectrical.ApplyToMatrix(A, b, deltaTime);
             }
         }
 
@@ -111,27 +111,25 @@ public class CircuitGraph {
                 double current = (comp.GetValue() != 0) ? vDiff / comp.GetValue() : 0;
                 comp.SetCalculatedCurrent(current);
 
-                if (comp instanceof Bulb) {
-                    ((Bulb) comp).CheckStatus(vA, vB);
+                if (comp instanceof Bulb bulb) {
+                    bulb.CheckStatus(vA, vB);
                 }
             } 
-            else if (comp instanceof VoltageSource) {
+            else if (comp instanceof VoltageSource voltageSource) {
                 // In MNA, the current of the k-th source is at solution[nodeCount + k]
-                int k = ((VoltageSource) comp).GetSourceIndex();
+                int k = voltageSource.GetSourceIndex();
                 // We use the negative because the solver usually treats source current as entering the node
                 comp.SetCalculatedCurrent(-solution[nodeCount + k]);
             } 
-            else if (comp instanceof Capacitor) {
+            else if (comp instanceof Capacitor cap) {
                 // I = C * dv/dt (In companion model: I = G * (V_curr - V_prev))
-                Capacitor cap = (Capacitor) comp;
                 double conductance = cap.GetValue() / deltaTime;
                 double current = conductance * (vDiff - cap.GetPreviousVoltageDiff());
                 cap.SetCalculatedCurrent(current);
                 cap.RecordPhysicsState(vA, vB);
             } 
-            else if (comp instanceof Inductor) {
+            else if (comp instanceof Inductor ind) {
                 // Update logic already exists in your Inductor.java
-                Inductor ind = (Inductor) comp;
                 ind.UpdateCurrent(vA, vB, deltaTime);
                 comp.SetCalculatedCurrent(ind.GetPreviousCurrent());
             }
