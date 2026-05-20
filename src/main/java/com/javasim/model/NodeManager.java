@@ -84,8 +84,23 @@ public class NodeManager {
                 ref.ComponentRef.GetNodeIds()[ref.PinIndex] = assignedId;
             }
         }
+        // 4. Assign unique IDs to any completely UNCONNECTED pins
+        for (Component c : components) {
+            int[] ids = c.GetNodeIds();
+            for (int i = 0; i < ids.length; i++) {
+                if (ids[i] == -1) {
+                    PinReference thisPin = new PinReference(c, i);
+                    if (groundPins.contains(thisPin)) {
+                        ids[i] = 0; // Explicitly set grounds stay 0
+                    } else {
+                        ids[i] = nextId++; // Floating pins get unique isolated IDs
+                    }
+                }
+            }
+        }
         
         int totalNodes = nextId - 1;
+        
     
     if (totalNodes > lastKnownNodeCount) {
         System.out.println("[LOG] New nodes created. Total active nodes: " + totalNodes);

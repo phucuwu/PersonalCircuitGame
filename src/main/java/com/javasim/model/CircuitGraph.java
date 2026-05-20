@@ -90,6 +90,14 @@ public class CircuitGraph {
         // If the solver failed due to a singular matrix (e.g., short circuit)
         if (solution == null) {
             lastErrorMessage = "Singular Matrix: Possible short circuit detected!";
+
+            // Reset all components so they don't visually "freeze" in an active state
+            for (Component c : components) {
+                c.SetCalculatedCurrent(0.0);
+                if (c instanceof Bulb) {
+                    ((Bulb) c).CheckStatus(0.0, 0.0); // Force the bulb to turn off
+                }
+            }
             return;
         }
 

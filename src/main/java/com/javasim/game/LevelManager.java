@@ -2,13 +2,9 @@
 package com.javasim.game;
 
 import com.google.gson.Gson;
+import com.javasim.model.Bulb;
 import com.javasim.model.CircuitGraph;
 import com.javasim.model.Component;
-import com.javasim.model.Bulb;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 
 public class LevelManager {
     private PuzzleLevel currentLevel;
@@ -23,19 +19,23 @@ public class LevelManager {
         this.isLevelCompleted = false;
         
         try {
-            // Locate the file in the resources/levels folder
             String fileName = "/levels/level" + levelId + ".json";
-            InputStream inputStream = getClass().getResourceAsStream(fileName);
+            java.io.InputStream inputStream = getClass().getResourceAsStream(fileName);
 
             if (inputStream == null) {
-                System.out.println("[GAME] Could not find " + fileName + ". You beat the game!");
+                System.out.println("[GAME] Could not find " + fileName + ".");
                 currentLevel = null;
                 return;
             }
 
-            // Read the JSON and magically convert it into our Java object
-            Reader reader = new InputStreamReader(inputStream);
+            java.io.Reader reader = new java.io.InputStreamReader(inputStream);
             currentLevel = gson.fromJson(reader, PuzzleLevel.class);
+            
+            // --- NEW SAFETY CHECK ---
+            if (currentLevel == null) {
+                System.err.println("[ERROR] " + fileName + " is empty or invalid!");
+                return;
+            }
             
             System.out.println("[GAME] Loaded Level " + levelId + ": " + currentLevel.GetTitle());
 
